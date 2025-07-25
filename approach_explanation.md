@@ -1,42 +1,19 @@
 ## Approach Explanation
 
-### Offline-First Document Intelligence
+### Section Extraction
 
-Our solution strictly follows the offline, CPU-only, persona-driven document analysis challenge.
+Sections are extracted using page-level and heading-based heuristics. Bold, large font, ALL CAPS or Title Case short lines are treated as headings. Between headings (or as fallback, per page), contiguous text blocks are taken to ensure the summarizer receives a full narrative context, similar to Adobe's own.
 
-**1. PDF Ingestion & Section Segmentation**
+### Section Ranking
 
-- **Parsing:** Uses `PyMuPDF` to process each PDF page as a dictionary of text blocks and spans.
-- **Section Detection:** Heuristically segments documents into sections. Headings are identified by:
-  - Bold or large font size spans,
-  - Lines in ALL CAPS,
-  - or lines suggestive of headers (short, ending with ":").
-- Each segment includes the detected title, raw text, and the exact page number for traceability.
+Each candidate section's composite embedding (title + text) is ranked using cosine similarity vs. an embedding of the persona/task. This ensures that only the most relevant topics (city guides, tips, experiences, etc.) rise to the top.
 
-**2. Embedding Representation**
+### Refined Text Extraction
 
-- Uses the compact `all-MiniLM-L6-v2` SentenceTransformer model (~82MB, pre-downloaded in Docker) to generate dense semantic embeddings.
-- Both the composite "query" (persona + job) and each PDF section are embedded using this model.
+Upon selection, the code locates the exact heading in the nominated PDF page and extracts all content below, up to the next heading or the end of page. Bullet points are converted to semicolon-separated clauses, and paragraphs are merged as needed. If the block is long, it's summarized using T5-small. Otherwise, it is kept as extractive, since Adobe’s samples favor extractive summaries by default.
 
-**3. Similarity Scoring & Section Ranking**
+### Output & Compliance
 
-- Computes cosine similarity between the query embedding and every section in every PDF.
-- A global top-5 ranking is produced (across all PDFs) for the final summary.
+A single `output.json` is produced, fully matching Adobe's challenge schema with three keys: metadata, extracted_sections, and subsection_analysis. All processing is CPU-only and fully offline; all models are pre-cached during Docker build.
 
-**4. Result Enrichment**
-
-- Each selected section is "refined" (truncated for length, avoiding mid-sentence cuts).
-- Runs additional sub-section analysis, further splitting by blank lines or likely subheadings to provide more granular, actionable chunks.
-- All output entries include provenance: file name, section title, page number, and similarity score.
-
-**5. Offline and Reproducible**
-
-- All model data is fetched at build time and baked into the Docker image for offline use.
-- Only open-source CPU libraries are used.
-- Handles 3–10 PDFs, arbitrary section granularity, and robustly falls back on documents where heading structure is unclear.
-
-**6. Output**
-
-- A global result file (`output.json`) and one per-PDF file, all schema-compliant.
-
-This approach ensures transparency, auditability, and relevancy for downstream persona-driven automation or manual review.
+This workflow was carefully engineered through side-by-side analysis to directly match Adobe's sample logic and outputs as closely as possible for both section selection and summary content.

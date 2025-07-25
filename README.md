@@ -1,32 +1,28 @@
-# Adobe Document Intelligence Challenge – Persona-driven Offline PDF Section Extractor
+# Adobe Persona-Driven PDF Section Extractor
 
-## Overview
+This Dockerized app extracts and summarizes the most relevant PDF sections for a target persona and job-to-be-done, matching Adobe's challenge output format.
 
-This tool extracts and prioritizes the most relevant sections from a collection of PDF documents based on a given persona and job-to-be-done, as per the Adobe Document Intelligence Challenge offline requirements.
+## Usage
 
-## Build & Run (Docker)
+1. **Build the Docker image**
 
-1. **Build (AMD64):**
+2. **Prepare input**
+- Place `input.json` and all required PDFs in an `input/` folder.
 
-2. **Prepare Inputs:**
-- Place `input.json` and all referenced PDFs inside an input directory, e.g. `./input/`
+3. **Run the container**
 
-3. **Run:**
-docker run --rm
--v $(pwd)/input:/app/input
--v $(pwd)/output:/app/output
---network none
-adobe-docintel:local
-
-4. **Review Outputs:**
-- See extracted results in `./output/`
-
-## Outputs
-
-- `output/output.json`: Final summary with top-5 global sections, sub-sections, and metadata.
-- `output/[filename].json`: Per-PDF relevant sections.
+4. **Review `output/output.json`**
+- Extracted sections and refined summaries will appear matching Adobe’s schema.
 
 ## Requirements
 
-- No internet access at runtime. All models are pre-packaged in the Docker image.
-- AMD64 CPU, Python 3.10+
+- No internet at runtime
+- CPU only, AMD64
+- Input at `/app/input`; output at `/app/output`
+
+## Output Schema
+
+- Single `output.json` with:
+- `"metadata"` (inputs, persona, timestamp)
+- `"extracted_sections"` (top-5, ranked)
+- `"subsection_analysis"` (refined text per section)
