@@ -28,6 +28,7 @@ Results are output as a single output.json, matching Adobe’s schema:
 metadata
 extracted_sections (with section info & ranking)
 subsection_analysis (with “refined_text” summaries)
+
 **Models and Libraries Used:**
 - PyMuPDF (fitz): PDF reading and text extraction.
 - sentence-transformers (“all-MiniLM-L6-v2”): For semantic embeddings and relevance ranking.
@@ -38,10 +39,13 @@ All models are pre-fetched into /app/model during Docker build.
 The pipeline does not require internet access at runtime and works on CPU.
 
 **How to Build & Run:**
+
 **Build the Docker image**
 docker build --platform linux/amd64 -t pdf-outline-extractor:latest .
+
 **Prepare Input:**
 Place your input.json and all PDFs referenced within it into an input/ folder in your project directory.
+
 **Run the Docker container:**
 docker run --rm -v "${PWD}\input:/app/input" -v "${PWD}\output:/app/output" --network none pdf-outline-extractor:latest
 (If using PowerShell, ensure ${PWD} resolves to your working directory.)
