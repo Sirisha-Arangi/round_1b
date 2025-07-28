@@ -21,6 +21,6 @@ RUN python3 -c "from transformers import T5Tokenizer, T5ForConditionalGeneration
 
 COPY main.py .
 COPY README.md .
-COPY approach_explanation.md .
+
 
 CMD ["python", "main.py"]
