@@ -45,7 +45,6 @@ docker run --rm -v "${PWD}\input:/app/input" -v "${PWD}\output:/app/output" --ne
 The result will be written to output/output.json in the required Adobe schema.
 
 
-**OUTPUT FOR COLLECTION1 IN 1B :**
 {
   "metadata": {
     "input_documents": [
@@ -120,8 +119,6 @@ The result will be written to output/output.json in the required Adobe schema.
       "page_number": 12
     }
   ]
-}
-
 
 **BRIEF EXPLANATION OF CODE**
 This solution processes the given PDFs by first splitting them into meaningful sections using a combination of text layout heuristics to detect headings and associated content blocks. It then uses powerful semantic embeddings from the sentence-transformers model (all-MiniLM-L6) to rank these sections by their relevance to the provided persona and job description.
