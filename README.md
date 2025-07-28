@@ -3,38 +3,42 @@
 This solution extracts the top 5 most relevant sections from a collection of PDFs based on a specified persona and job-to-be-done. For each relevant section, the system produces a human-like summary (“refined_text”). All outputs follow the Adobe challenge schema.
 
 **Approach:**
+
 Section Extraction:
 Each PDF is parsed using PyMuPDF to extract large, coherent content blocks—typically full paragraphs or multi-paragraph sections.
 Section titles are generated using heading heuristics or the first sentence.
 
 **Semantic Ranking:**
+
 Each section’s text is combined with its title and encoded using a local Sentence Transformers model (“all-MiniLM-L6-v2”).
 Query embeddings are generated from the persona and job description. Sections are ranked by cosine similarity to the query embedding.
 
 **Dynamic Relevance Boosting:**
+
 To increase alignment with any persona/job, dynamic keywords are extracted from the query (persona + job), and similarity scores are boosted for sections containing these keywords.
 
 **Summarization:**
+
 For each selected section, a summary (“refined_text”) is produced.
 If the section is long, it is summarized using t5-small (via HuggingFace Transformers); otherwise, the full cleaned text is used directly. Summarization is guided with a prompt tailored to the persona/job context.
 
 **Output Formatting:**
+
 Results are output as a single output.json, matching Adobe’s schema:
 metadata
 extracted_sections (with section info & ranking)
 subsection_analysis (with “refined_text” summaries)
-**Models and Libraries Used**
-PyMuPDF (fitz): PDF reading and text extraction.
-sentence-transformers (“all-MiniLM-L6-v2”): For semantic embeddings and relevance ranking.
-HuggingFace Transformers (“t5-small” + “sentencepiece”): For abstractive summarization of extracted content.
-scikit-learn: For cosine similarity computation.
-numpy, re, string: Utilities for text processing and analysis.
-
+**Models and Libraries Used:**
+- PyMuPDF (fitz): PDF reading and text extraction.
+- sentence-transformers (“all-MiniLM-L6-v2”): For semantic embeddings and relevance ranking.
+- HuggingFace Transformers (“t5-small” + “sentencepiece”): For abstractive summarization of extracted content.
+- scikit-learn: For cosine similarity computation.
+- numpy, re, string: Utilities for text processing and analysis.
 All models are pre-fetched into /app/model during Docker build.
 The pipeline does not require internet access at runtime and works on CPU.
 
-**How to Build & Run**
-**Build the Docker image:**
+**How to Build & Run:**
+**Build the Docker image**
 docker build --platform linux/amd64 -t pdf-outline-extractor:latest .
 **Prepare Input:**
 Place your input.json and all PDFs referenced within it into an input/ folder in your project directory.
