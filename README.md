@@ -121,10 +121,10 @@ The result will be written to output/output.json in the required Adobe schema.
   ]
 
 **BRIEF EXPLANATION OF CODE**
-This solution processes the given PDFs by first splitting them into meaningful sections using a combination of text layout heuristics to detect headings and associated content blocks. It then uses powerful semantic embeddings from the sentence-transformers model (all-MiniLM-L6) to rank these sections by their relevance to the provided persona and job description.
-
-To further align the ranking with the specific context of the task, the system dynamically extracts keywords from the persona and job text and slightly boosts the scores of sections containing these keywords.
-
-For summarization, the approach leverages a pre-downloaded T5-small model, which generates natural, concise summaries of the relevant sections, guided explicitly by the persona and job context.
-
-Finally, the code outputs the top five most relevant sections along with their human-readable summaries in the required JSON schema — all in an offline, distributed manner using Docker.
+This solution processes the given PDFs by first splitting them into meaningful sections using a combination of text layout heuristics to detect headings and associated content blocks. It then uses powerful semantic embeddings from the sentence-transformers model (all-MiniLM-L6) to rank these sections by their relevance to the provided persona and job description.To further align the ranking with the specific context of the task, the system dynamically extracts keywords from the persona and job text and slightly boosts the scores of sections containing these keywords.For summarization, the approach leverages a pre-downloaded T5-small model, which generates natural, concise summaries of the relevant sections, guided explicitly by the persona and job context.Finally, the code outputs the top five most relevant sections along with their human-readable summaries in the required JSON schema — all in an offline, distributed manner using Docker.
+**FOLDER STRUCTURE EXPLANATION**
+main.py implements the end-to-end processing: extraction, ranking, summarization, and output generation.
+requirements.txt specifies all Python package dependencies.
+Dockerfile automates the build process, including installing dependencies and downloading model files offline.
+The input/ directory serves as the location from which PDFs and input.json (which have persona and job to be done are present) are read.
+The output/ directory receives generated output, especially the final output.json.
